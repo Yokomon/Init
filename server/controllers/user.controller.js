@@ -1,5 +1,6 @@
 import User from "./../models/user.model";
 import errorHandler from "./../handlers/dbErrorHandler";
+import extend from "lodash/extend";
 
 // Create new user record
 const create = async (req, res) => {
@@ -54,4 +55,22 @@ const read = (req, res) => {
   res.status(200).json(user);
 };
 
-export default { create, list, getUserId, read };
+// Update a user record
+
+const update = async (req, res) => {
+  try {
+    let user = req.profile;
+    user = extend(user, req.body);
+    user.updated = Date.now();
+    await user.save();
+    user.salt = undefined;
+    user.hashed_password = undefined;
+    res.status(200).json(user);
+  } catch (error) {
+    return res.status(400).json({
+      error: errorHandler.getErrorMessage(error),
+    });
+  }
+};
+
+export default { create, list, getUserId, read, update };
