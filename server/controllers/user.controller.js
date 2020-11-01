@@ -73,4 +73,19 @@ const update = async (req, res) => {
   }
 };
 
-export default { create, list, getUserId, read, update };
+// Delete a user record
+const remove = async (req, res) => {
+  try {
+    let user = req.profile;
+    let deletedUser = await user.remove();
+    deletedUser.salt = undefined;
+    deletedUser.hashed_password = undefined;
+    res.status(200).json(deletedUser);
+  } catch (error) {
+    return res.status(400).json({
+      error: errorHandler.getErrorMessage(error),
+    });
+  }
+};
+
+export default { create, list, getUserId, read, update, remove };
