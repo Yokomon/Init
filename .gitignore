@@ -1,4 +1,5 @@
-# NODE_MODULES...
+# NODE_MODULES and other relevant files...
 node_modules
-
 .env
+dist
+yarn.lock
