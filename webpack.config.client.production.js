@@ -1,18 +1,14 @@
 const path = require("path");
 const CWD = process.cwd();
-const nodeExternals = require("webpack-node-externals");
 
 const config = {
-  name: "server",
-  target: "node",
-  entry: [path.join(CWD, "/server/server.js")],
+  mode: "production",
+  entry: [path.join(CWD, "/client/main.js")],
   output: {
-    filename: "server.generated.js",
+    filename: "bundle.js",
     path: path.join(CWD, "/dist"),
     publicPath: "/dist",
-    libraryTarget: "commonjs",
   },
-  externals: [nodeExternals()],
   module: {
     rules: [
       {
