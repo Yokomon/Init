@@ -4,6 +4,7 @@ import compression from "compression";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import userRoutes from "./routes/user.routes";
+import authRoutes from "./routes/auth.routes";
 
 const app = express();
 
@@ -15,5 +16,6 @@ app.use(helmet());
 app.use(compression());
 
 app.use("/", userRoutes);
+app.use("/", authRoutes);
 
 export default app;
