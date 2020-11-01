@@ -1,6 +1,7 @@
 import User from "./../models/user.model";
 import config from "./../../config/config";
 import jwt from "jsonwebtoken";
+import expressJWT from "express-jwt";
 
 const signin = async (req, res) => {
   try {
@@ -39,4 +40,25 @@ const signout = (req, res) => {
   });
 };
 
-export default { signin, signout };
+const requireSignIn = expressJWT({
+  secret: config.jwtSecret,
+  userProperty: "auth",
+  algorithms: ["HS256"],
+});
+
+const hasAuthorization = (req, res, next) => {
+  try {
+    if (!(req.auth && req.profile && req.auth._id == req.profile._id)) {
+      return res.status(403).json({
+        error: "You are not authorized to handle this operation",
+      });
+    }
+    next();
+  } catch (error) {
+    return res.status(400).json({
+      error: `ISE: ${error.message}`,
+    });
+  }
+};
+
+export default { signin, signout, requireSignIn, hasAuthorization };
