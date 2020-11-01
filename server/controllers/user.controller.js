@@ -16,4 +16,16 @@ const create = async (req, res) => {
   }
 };
 
-export default { create };
+// List all users in the database
+const list = async (req, res) => {
+  try {
+    let users = await User.find().select("_id name email created updated");
+    return res.status(200).json(users);
+  } catch (error) {
+    return res.status(400).json({
+      error: errorHandler.getErrorMessage(error),
+    });
+  }
+};
+
+export default { create, list };
