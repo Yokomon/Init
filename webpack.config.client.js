@@ -12,8 +12,8 @@ const config = {
   ],
   output: {
     filename: "bundle.js",
-    path: path.join(CWD, "dist"),
-    publicPath: "dist",
+    path: path.join(CWD, "/dist"),
+    publicPath: "/dist",
   },
   module: {
     rules: [
@@ -28,8 +28,10 @@ const config = {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
   ],
-  alias: {
-    "react-dom": "@hot-loader/react-dom",
+  resolve: {
+    alias: {
+      "react-dom": "@hot-loader/react-dom",
+    },
   },
 };
 
