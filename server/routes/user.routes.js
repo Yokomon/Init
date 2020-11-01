@@ -9,4 +9,6 @@ Router.route("/api/user/:userId")
   .put(userCtrl.update)
   .delete(userCtrl.remove);
 
+Router.param("userId", userCtrl.getUserId);
+
 export default Router;
