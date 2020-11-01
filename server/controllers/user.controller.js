@@ -28,4 +28,30 @@ const list = async (req, res) => {
   }
 };
 
-export default { create, list };
+// Get each user unique id from req.params{}
+const getUserId = async (req, res, next) => {
+  try {
+    let user = await User.findById(req.params.userId);
+    if (!user) {
+      return res.status(404).json({
+        error: "User record not found",
+      });
+    }
+    req.profile = user;
+    next();
+  } catch (error) {
+    return res.status(400).json({
+      error: "Could not retrieve the user credentials",
+    });
+  }
+};
+
+// Read each user record
+const read = (req, res) => {
+  let user = req.profile;
+  user.salt = undefined;
+  user.hashed_password = undefined;
+  res.status(200).json(user);
+};
+
+export default { create, list, getUserId, read };
