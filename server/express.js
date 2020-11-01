@@ -5,8 +5,10 @@ import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import userRoutes from "./routes/user.routes";
 import authRoutes from "./routes/auth.routes";
+import { webpackCompile } from "./devBundle";
 
 const app = express();
+webpackCompile(app);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
