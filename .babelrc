@@ -10,5 +10,5 @@
     ],
     "@babel/preset-react"
   ],
-  "plugins": ["react-hot-loader"]
+  "plugins": ["react-hot-loader/babel"]
 }
