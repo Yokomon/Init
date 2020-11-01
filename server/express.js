@@ -3,6 +3,7 @@ import cors from "cors";
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
+import userRoutes from "./routes/user.routes";
 
 const app = express();
 
@@ -13,8 +14,6 @@ app.use(cors());
 app.use(helmet());
 app.use(compression());
 
-app.use("/", (req, res) => {
-  res.send("Hello from init");
-});
+app.use("/", userRoutes);
 
 export default app;
