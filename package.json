@@ -2,8 +2,37 @@
   "name": "init",
   "version": "1.0.0",
   "description": "A mini social platform where users can share their thoughts with one another, chat with loved ones and get updated on what's trending!",
-  "main": "index.js",
   "repository": "https://github.com/Yokomon/Init.git",
   "author": "yokomon",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "development": "nodemon",
+    "start": "NODE_ENV=production node ./dist/server.generated.js",
+    "build": "webpack --mode=production --config webpack.config.server.js && webpack --config webpack.config.client.production.js"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.3",
+    "@babel/preset-env": "^7.12.1",
+    "@babel/preset-react": "^7.12.1",
+    "@hot-loader/react-dom": "^17.0.0",
+    "babel-loader": "^8.1.0",
+    "file-loader": "^6.2.0",
+    "nodemon": "^2.0.6",
+    "webpack": "^5.3.2",
+    "webpack-cli": "^4.1.0",
+    "webpack-dev-middleware": "^4.0.0",
+    "webpack-hot-middleware": "^2.25.0",
+    "webpack-node-externals": "^2.5.2"
+  },
+  "dependencies": {
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-jwt": "^6.0.0",
+    "helmet": "^4.1.1",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.20",
+    "mongoose": "^5.10.11"
+  }
 }
