@@ -1,0 +1,9 @@
+{
+  "name": "init",
+  "version": "1.0.0",
+  "description": "A mini social platform where users can share their thoughts with one another, chat with loved ones and get updated on what's trending!",
+  "main": "index.js",
+  "repository": "https://github.com/Yokomon/Init.git",
+  "author": "yokomon",
+  "license": "MIT"
+}
