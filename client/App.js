@@ -4,12 +4,15 @@ import MainRouter from "./MainRouter";
 import { BrowserRouter } from "react-router-dom";
 import theme from "./theme";
 import ThemeProvider from "@material-ui/styles/ThemeProvider";
+import Paper from "@material-ui/core/Paper";
 
 const App = () => {
   return (
     <BrowserRouter>
       <ThemeProvider theme={theme}>
-        <MainRouter />
+        <Paper style={{ height: "100vh" }}>
+          <MainRouter />
+        </Paper>
       </ThemeProvider>
     </BrowserRouter>
   );
