@@ -114,7 +114,7 @@ export default function SignUp() {
     create(user).then((data) => {
       if (data && data.error)
         setValues({ ...values, server_error: data.error });
-      else setValues({ ...values, open: true, redirectToUsers: true });
+      else setValues({ ...values, open: true });
     });
   };
 
