@@ -28,7 +28,7 @@ app.use(compression());
 
 app.use("/", userRoutes);
 app.use("/", authRoutes);
-app.get("/", (req, res) => {
+app.use("/", (req, res) => {
   return res.status(200).send(Template());
 });
 
