@@ -17,7 +17,8 @@ const useStyles = makeStyles((theme) => ({
   paper: {
     maxWidth: 600,
     margin: "auto",
-    marginTop: theme.spacing(6),
+    position: "relative",
+    top: theme.spacing(6),
     textAlign: "center",
   },
   title: {
