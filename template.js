@@ -10,7 +10,7 @@ export default () => {
             }
         </style>
     </head>
-    <body style="margin:0px; width:100%; height:100vh">
+    <body style="margin:0px; width:100%">
         <div id="root">
         </div>
         <script type="text/javascript" src="/dist/bundle.js"></script>
