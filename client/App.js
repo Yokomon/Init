@@ -3,7 +3,7 @@ import { hot } from "react-hot-loader";
 import MainRouter from "./MainRouter";
 import { BrowserRouter } from "react-router-dom";
 import theme from "./theme";
-import ThemeProvider from "@material-ui/styles/ThemeProvider";
+import { ThemeProvider } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 
 const App = () => {
