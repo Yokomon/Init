@@ -5,6 +5,21 @@ import expressJWT from "express-jwt";
 
 const signin = async (req, res) => {
   try {
+    if (!req.body.email.match(/.+\@.+\..+/)) {
+      return res.status(400).json({
+        error: "Email address is invalid",
+      });
+    }
+    if (typeof req.body.email == "undefined") {
+      return res.status(400).json({
+        error: "Email field cannot be empty",
+      });
+    }
+    if (req.body.password.length <= 0) {
+      return res.status(400).json({
+        error: "Password is required",
+      });
+    }
     let user = await User.findOne({ email: req.body.email });
     if (!user) {
       return res.status(400).json({

@@ -1,22 +1,17 @@
 import React, { useState } from "react";
-import { create } from "./api.user";
+import { signin } from "./../auth/api.auth";
 import TextField from "@material-ui/core/TextField";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
-import Lock from "@material-ui/icons/Lock";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
+import Lock from "@material-ui/icons/LockOpen";
 import Avatar from "@material-ui/core/Avatar";
 import Error from "@material-ui/icons/ErrorOutline";
 import { makeStyles } from "@material-ui/core/styles";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import debounce from "lodash/debounce";
-import { Link } from "react-router-dom";
-import Divider from "@material-ui/core/Divider";
+import { Redirect } from "react-router-dom";
+import { authenticate } from "./../auth/auth";
 
 const useStyles = makeStyles((theme) => ({
   input: {
@@ -24,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     margin: theme.spacing(1),
-    color: theme.palette.openTitle
+    color: "#4964f3",
   },
   paper: {
     textAlign: "center",
@@ -45,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
     width: 50,
     height: 50,
     margin: "auto",
-    backgroundColor: "#e04343",
+    backgroundColor: "#4964f3",
   },
   error: {
     verticalAlign: "middle",
@@ -53,14 +48,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignUp() {
+export default function SignIn() {
   const [values, setValues] = useState({
-    name: "",
     email: "",
     password: "",
     error: "",
     server_error: "",
-    open: false,
+    redirectToUsers: false,
   });
   const classes = useStyles();
 
@@ -68,17 +62,6 @@ export default function SignUp() {
     event.persist();
     const { value } = event.target;
     switch (name) {
-      case "name":
-        debounce(() => {
-          value.length <= 0
-            ? setValues({
-                ...values,
-                error: "Name field is required",
-                [name]: value,
-              })
-            : setValues({ ...values, [name]: value, error: "" });
-        }, 1000)();
-        break;
       case "email":
         debounce(() => {
           value.match(/.+\@.+\..+/)
@@ -88,7 +71,7 @@ export default function SignUp() {
                 error: "Email address is invalid",
                 [name]: value,
               });
-        }, 2500)();
+        }, 2000)();
         break;
       case "password":
         value.length < 6
@@ -107,17 +90,23 @@ export default function SignUp() {
 
   const handleSubmit = () => {
     const user = {
-      name: values.name,
       email: values.email,
       password: values.password,
     };
 
-    create(user).then((data) => {
+    signin(user).then((data) => {
       if (data && data.error)
         setValues({ ...values, server_error: data.error });
-      else setValues({ ...values, open: true });
+      else
+        authenticate(data, () => {
+          setValues({ ...values, redirectToUsers: true });
+        });
     });
   };
+
+  if (values.redirectToUsers) {
+    return <Redirect to={"/users"} />;
+  }
 
   return (
     <Paper elevation={3} className={classes.paper}>
@@ -126,22 +115,8 @@ export default function SignUp() {
           <Lock />
         </Avatar>
         <Typography variant={"h5"} className={classes.title}>
-          Sign up
+          Sign in
         </Typography>
-        <TextField
-          name="Name"
-          label="Name"
-          variant={"outlined"}
-          className={classes.input}
-          margin="normal"
-          type="text"
-          error={values.error.substring(0, 4) === "Name" ? true : false}
-          helperText={
-            values.error.substring(0, 4) === "Name" ? values.error : false
-          }
-          required
-          onChange={handleInput("name")}
-        />
         <TextField
           name="Email"
           label="Email"
@@ -149,7 +124,6 @@ export default function SignUp() {
           type="email"
           className={classes.input}
           margin="normal"
-          error={values.error.substring(0, 5) === "Email" ? true : false}
           helperText={
             values.error.substring(0, 5) === "Email" ? values.error : false
           }
@@ -178,28 +152,12 @@ export default function SignUp() {
       )}
       <Button
         variant={"outlined"}
-        color={"primary"}
+        color="primary"
         className={classes.btn}
         onClick={handleSubmit}
       >
-        Submit
+        Log in
       </Button>
-      <Dialog open={values.open}>
-        <DialogTitle>Account</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            User account successfully created
-          </DialogContentText>
-        </DialogContent>
-        <Divider />
-        <DialogActions>
-          <Link to={"/users"}>
-            <Button color={"primary"} variant={"contained"} size={"small"}>
-              Users
-            </Button>
-          </Link>
-        </DialogActions>
-      </Dialog>
     </Paper>
   );
 }

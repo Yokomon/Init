@@ -1,22 +1,16 @@
-import React, { useState } from "react";
-import { create } from "./api.user";
+import React, { useState, useEffect } from "react";
+import { read, update } from "./api.user";
 import TextField from "@material-ui/core/TextField";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
-import Lock from "@material-ui/icons/Lock";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
+import Update from "@material-ui/icons/SystemUpdateOutlined";
 import Avatar from "@material-ui/core/Avatar";
 import Error from "@material-ui/icons/ErrorOutline";
 import { makeStyles } from "@material-ui/core/styles";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
-import debounce from "lodash/debounce";
-import { Link } from "react-router-dom";
-import Divider from "@material-ui/core/Divider";
+import { Redirect } from "react-router-dom";
+import { isAuthenticated } from "./../auth/auth";
 
 const useStyles = makeStyles((theme) => ({
   input: {
@@ -24,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     margin: theme.spacing(1),
-    color: theme.palette.openTitle
+    color: theme.palette.openTitle,
   },
   paper: {
     textAlign: "center",
@@ -53,51 +47,54 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignUp() {
+export default function EditProfile({ match }) {
+  let abortController = new AbortController();
+  let signal = abortController.signal;
+  let jwt = isAuthenticated();
   const [values, setValues] = useState({
     name: "",
     email: "",
-    password: "",
     error: "",
     server_error: "",
-    open: false,
+    redirectToProfile: false,
   });
   const classes = useStyles();
 
+  useEffect(() => {
+    read({ userId: match.params.userId }, { t: jwt.token }, signal).then(
+      (data) => {
+        data && data.error ? (
+          <Redirect to="/signin" />
+        ) : (
+          setValues({ ...values, name: data.name, email: data.email })
+        );
+      }
+    );
+    return function cleanup() {
+      abortController.abort();
+    };
+  }, [match.params.userId]);
+
   const handleInput = (name) => (event) => {
-    event.persist();
     const { value } = event.target;
     switch (name) {
       case "name":
-        debounce(() => {
-          value.length <= 0
-            ? setValues({
-                ...values,
-                error: "Name field is required",
-                [name]: value,
-              })
-            : setValues({ ...values, [name]: value, error: "" });
-        }, 1000)();
-        break;
-      case "email":
-        debounce(() => {
-          value.match(/.+\@.+\..+/)
-            ? setValues({ ...values, error: "", [name]: value })
-            : setValues({
-                ...values,
-                error: "Email address is invalid",
-                [name]: value,
-              });
-        }, 2500)();
-        break;
-      case "password":
-        value.length < 6
+        value.length <= 0
           ? setValues({
               ...values,
-              error: "Password must be 6 characters or more",
+              error: "Name field is required",
               [name]: value,
             })
-          : setValues({ ...values, error: "", [name]: value });
+          : setValues({ ...values, [name]: value, error: "" });
+        break;
+      case "email":
+        value.match(/.+\@.+\..+/)
+          ? setValues({ ...values, error: "", [name]: value })
+          : setValues({
+              ...values,
+              error: "Email address is invalid",
+              [name]: value,
+            });
         break;
       default:
         setValues({ ...values, [name]: value });
@@ -106,36 +103,41 @@ export default function SignUp() {
   };
 
   const handleSubmit = () => {
-    const user = {
-      name: values.name,
-      email: values.email,
-      password: values.password,
+    const userData = {
+      name: values.name || undefined,
+      email: values.email || undefined,
     };
 
-    create(user).then((data) => {
-      if (data && data.error)
-        setValues({ ...values, server_error: data.error });
-      else setValues({ ...values, open: true });
-    });
+    update({ userId: match.params.userId }, { t: jwt.token }, userData)
+      .then((data) => {
+        if (data && data.error)
+          setValues({ ...values, server_error: data.error });
+        else setValues({ ...values, redirectToProfile: true, id: data._id });
+      })
+      .catch((e) => console.error(e));
   };
+
+  if (values.redirectToProfile) {
+    return <Redirect to={`/user/${values.id}`} />;
+  }
 
   return (
     <Paper elevation={3} className={classes.paper}>
       <CardContent>
         <Avatar className={classes.avatar}>
-          <Lock />
+          <Update />
         </Avatar>
         <Typography variant={"h5"} className={classes.title}>
-          Sign up
+          Edit profile
         </Typography>
         <TextField
           name="Name"
           label="Name"
           variant={"outlined"}
+          value={values.name}
           className={classes.input}
           margin="normal"
           type="text"
-          error={values.error.substring(0, 4) === "Name" ? true : false}
           helperText={
             values.error.substring(0, 4) === "Name" ? values.error : false
           }
@@ -147,27 +149,14 @@ export default function SignUp() {
           label="Email"
           variant={"outlined"}
           type="email"
+          value={values.email}
           className={classes.input}
           margin="normal"
-          error={values.error.substring(0, 5) === "Email" ? true : false}
           helperText={
             values.error.substring(0, 5) === "Email" ? values.error : false
           }
           required
           onChange={handleInput("email")}
-        />
-        <TextField
-          name="Password"
-          label="Password"
-          variant={"outlined"}
-          className={classes.input}
-          margin="normal"
-          type="password"
-          required
-          helperText={
-            values.error.substring(0, 8) === "Password" ? values.error : false
-          }
-          onChange={handleInput("password")}
         />
       </CardContent>
       {values.server_error && (
@@ -182,24 +171,8 @@ export default function SignUp() {
         className={classes.btn}
         onClick={handleSubmit}
       >
-        Submit
+        Update
       </Button>
-      <Dialog open={values.open}>
-        <DialogTitle>Account</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            User account successfully created
-          </DialogContentText>
-        </DialogContent>
-        <Divider />
-        <DialogActions>
-          <Link to={"/users"}>
-            <Button color={"primary"} variant={"contained"} size={"small"}>
-              Users
-            </Button>
-          </Link>
-        </DialogActions>
-      </Dialog>
     </Paper>
   );
 }

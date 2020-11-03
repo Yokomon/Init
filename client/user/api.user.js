@@ -30,4 +30,37 @@ const create = async (user) => {
   }
 };
 
-export { list, create };
+const read = async (params, credentials, signal) => {
+  try {
+    let response = await fetch(`/api/user/${params.userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${credentials.t}`,
+      },
+      signal,
+    });
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const update = async (params, credentials, user) => {
+  try {
+    let response = await fetch(`/api/user/${params.userId}`, {
+      method: "PUT",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${credentials.t}`,
+      },
+      body: JSON.stringify(user),
+    });
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export { list, create, read, update };
