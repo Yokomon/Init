@@ -19,6 +19,7 @@ const isAuthenticated = () => {
 
 const clearJWT = (cb) => {
   if (typeof window !== "undefined") {
+    localStorage.removeItem("jwt");
     signout().then((data) => {
       document.cookie = "t=; expires=Jan 1970 00:00:00 UTC;path=/;";
     });
