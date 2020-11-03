@@ -46,4 +46,21 @@ const read = async (params, credentials, signal) => {
   }
 };
 
-export { list, create, read };
+const update = async (params, credentials, user) => {
+  try {
+    let response = await fetch(`/api/user/${params.userId}`, {
+      method: "PUT",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${credentials.t}`,
+      },
+      body: JSON.stringify(user),
+    });
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export { list, create, read, update };
