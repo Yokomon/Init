@@ -11,7 +11,7 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Avatar from "@material-ui/core/Avatar";
 import Error from "@material-ui/icons/ErrorOutline";
-import { makeStyles } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import debounce from "lodash/debounce";
@@ -24,6 +24,7 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     margin: theme.spacing(1),
+    color: theme.palette.openTitle
   },
   paper: {
     textAlign: "center",
@@ -44,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
     width: 50,
     height: 50,
     margin: "auto",
-    backgroundColor: theme.palette.openTitle,
+    backgroundColor: "#e04343",
   },
   error: {
     verticalAlign: "middle",
@@ -177,7 +178,7 @@ export default function SignUp() {
       )}
       <Button
         variant={"outlined"}
-        color="primary"
+        color={"primary"}
         className={classes.btn}
         onClick={handleSubmit}
       >
