@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/styles";
+import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -10,7 +10,8 @@ import ArrowForward from "@material-ui/icons/ArrowForward";
 import IconButton from "@material-ui/core/IconButton";
 import { list } from "./api.user";
 import Avatar from "@material-ui/core/Avatar";
-import Typography from "@material-ui/core/Typography";
+import People from "@material-ui/icons/PeopleOutline";
+import Person from "@material-ui/icons/PersonOutline";
 import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
@@ -26,7 +27,12 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: theme.spacing(2),
   },
   text: {
-    color: theme.palette.openTitle,
+    color: theme.palette.primary.main,
+  },
+  avatar: {
+    margin: "auto",
+    width: 50,
+    height: 50,
   },
 }));
 
@@ -49,16 +55,21 @@ const Users = () => {
 
   return (
     <Paper elevation={4} className={classes.paper}>
-      <Typography variant={"h6"} color="primary" className={classes.title}>
-        All users
-      </Typography>
       <List>
+        <Avatar
+          className={classes.avatar}
+          style={{ backgroundColor: "#1976d2b5" }}
+        >
+          <People />
+        </Avatar>
         {values.map((value, i) => {
           return (
-            <Link to={`/api/user/${value._id}`} key={i}>
+            <Link to={`/user/${value._id}`} key={i}>
               <ListItem>
                 <ListItemAvatar>
-                  <Avatar />
+                  <Avatar>
+                    <Person />
+                  </Avatar>
                 </ListItemAvatar>
                 <ListItemText primary={value.name} className={classes.text} />
                 <ListItemSecondary>
