@@ -102,7 +102,8 @@ export default function Profile({ match }) {
           </div>
         ) : (
           <ListItemText
-            primary={`Joined: ${new Date(values.created).toDateString()}`}
+            primary={values.about}
+            secondary={`Joined: ${new Date(values.created).toDateString()}`}
             className={classes.listItemText}
           />
         )}
