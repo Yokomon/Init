@@ -5,6 +5,7 @@ import { withRouter, Link } from "react-router-dom";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
+import { isAuthenticated, clearJWT } from "./../auth/auth";
 
 const isActive = (history, pathname) => {
   if (history.location.pathname === pathname) {
@@ -51,22 +52,46 @@ const Menu = withRouter(({ history }) => {
               Users
             </Button>
           </Link>
-          <Link to="/signup">
-            <Button
-              style={isActive(history, "/signup")}
-              className={classes.btn}
-            >
-              Sign up
-            </Button>
-          </Link>
-          <Link to="/signin">
-            <Button
-              style={isActive(history, "/signin")}
-              className={classes.btn}
-            >
-              Sign in
-            </Button>
-          </Link>
+          {isAuthenticated() ? (
+            <>
+              <Link to={`/user/${isAuthenticated().user._id}`}>
+                <Button
+                  style={isActive(
+                    history,
+                    `/user/${isAuthenticated().user._id}`
+                  )}
+                  className={classes.btn}
+                >
+                  Profile
+                </Button>
+              </Link>
+              <Button
+                style={{ color: "#1976d2" }}
+                onClick={() => clearJWT(() => history.push("/"))}
+              >
+                Sign out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Link to="/signup">
+                <Button
+                  style={isActive(history, "/signup")}
+                  className={classes.btn}
+                >
+                  Sign up
+                </Button>
+              </Link>
+              <Link to="/signin">
+                <Button
+                  style={isActive(history, "/signin")}
+                  className={classes.btn}
+                >
+                  Sign in
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </ToolBar>
     </AppBar>
