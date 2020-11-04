@@ -17,6 +17,7 @@ import Typography from "@material-ui/core/Typography";
 import { Link } from "react-router-dom";
 import DeleteProfile from "./DeleteProfile";
 import Person from "@material-ui/icons/PersonOutline";
+import Skeleton from "@material-ui/lab/Skeleton";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -36,6 +37,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Profile({ match }) {
+  const [loading, setLoading] = useState(true);
   const [values, setValues] = useState({});
   const classes = useStyles();
   useEffect(() => {
@@ -44,9 +46,12 @@ export default function Profile({ match }) {
     let jwt = isAuthenticated();
     read({ userId: match.params.userId }, { t: jwt.token }, signal)
       .then((data) => {
-        data && data.error
-          ? setValues({ ...values, error: data.error })
-          : setValues(data);
+        if (data && data.error) {
+          setValues({ ...values, error: data.error });
+        } else {
+          setLoading(false);
+          setValues(data);
+        }
       })
       .catch((e) => console.error(e));
   }, [match.params.userId]);
@@ -63,9 +68,21 @@ export default function Profile({ match }) {
         </Typography>
         <ListItem>
           <ListItemAvatar>
-            <Avatar />
+            {loading ? (
+              <Skeleton variant="circle" width={50} height={50} />
+            ) : (
+              <Avatar width={50} height={50} />
+            )}
           </ListItemAvatar>
-          <ListItemText primary={values.name} secondary={values.email} />
+          {loading ? (
+            <div style={{ width: 300 }}>
+              <Skeleton />
+              <Skeleton width={100} />
+            </div>
+          ) : (
+            <ListItemText primary={values.name} secondary={values.email} />
+          )}
+
           {isAuthenticated() && isAuthenticated().user._id === values._id && (
             <ListItemSecondaryAction>
               <Link to={`/user/edit/${values._id}`}>
@@ -78,10 +95,17 @@ export default function Profile({ match }) {
           )}
         </ListItem>
         <Divider />
-        <ListItemText
-          primary={`Joined: ${new Date(values.created).toDateString()}`}
-          className={classes.listItemText}
-        />
+        {loading ? (
+          <div style={{ margin: "10px 0px 5px 10px", width: 220 }}>
+            <Skeleton />
+            <Skeleton width={80} />
+          </div>
+        ) : (
+          <ListItemText
+            primary={`Joined: ${new Date(values.created).toDateString()}`}
+            className={classes.listItemText}
+          />
+        )}
       </List>
     </Paper>
   );
