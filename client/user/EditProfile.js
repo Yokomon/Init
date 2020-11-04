@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
   title: {
     color: theme.palette.openTitle,
     position: "relative",
-    top: "5px",
+    top: "8px",
   },
   paper: {
     textAlign: "center",
@@ -43,6 +43,11 @@ const useStyles = makeStyles((theme) => ({
   error: {
     verticalAlign: "middle",
     margin: theme.spacing(1),
+  },
+  span: {
+    position: "relative",
+    top: "8px",
+    left: "10px",
   },
 }));
 
@@ -102,10 +107,7 @@ export default function EditProfile({ match }) {
             })
           : setValues({ ...values, error: "", [name]: value });
         break;
-      case "profile_picture":
-        let pic = event.target.files[0];
-        setValues({ ...values, error: "", [name]: pic });
-        break;
+
       case "email":
         value.match(/.+\@.+\..+/)
           ? setValues({ ...values, error: "", [name]: value })
@@ -115,6 +117,10 @@ export default function EditProfile({ match }) {
               [name]: value,
             });
         break;
+      case "profile_picture":
+        const { files } = event.target;
+        setValues({ ...values, error: "", [name]: files[0] });
+        break;
       default:
         setValues({ ...values, [name]: value });
         break;
@@ -122,11 +128,12 @@ export default function EditProfile({ match }) {
   };
 
   const handleSubmit = () => {
-    const userData = {
-      name: values.name || undefined,
-      email: values.email || undefined,
-      about: values.about || undefined,
-    };
+    let userData = new FormData();
+    values.name && userData.append("name", values.name);
+    values.about && userData.append("about", values.about);
+    values.email && userData.append("email", values.email);
+    values.profile_picture &&
+      userData.append("profile_picture", values.profile_picture);
 
     update({ userId: match.params.userId }, { t: jwt.token }, userData)
       .then((data) => {
@@ -156,7 +163,9 @@ export default function EditProfile({ match }) {
       <label htmlFor="profile_pic">
         <Picture className={classes.pic} />
       </label>
-      <span>{values.profile_picture}</span>
+      <span className={classes.span}>
+        {values.profile_picture ? values.profile_picture.name : ""}
+      </span>
       <CardContent>
         <TextField
           name="Name"
