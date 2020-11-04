@@ -33,6 +33,7 @@ const useStyles = makeStyles((theme) => ({
     margin: "auto",
     width: 50,
     height: 50,
+    marginBottom: theme.spacing(3),
   },
 }));
 
