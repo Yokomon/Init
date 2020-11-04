@@ -83,7 +83,7 @@ export default function SignIn() {
           : setValues({ ...values, error: "", [name]: value });
         break;
       default:
-        setValues({ ...values, [name]: value });
+        setValues({ ...values, [name]: value, error: "" });
         break;
     }
   };
@@ -99,13 +99,13 @@ export default function SignIn() {
         setValues({ ...values, server_error: data.error });
       else
         authenticate(data, () => {
-          setValues({ ...values, redirectToUsers: true });
+          setValues({ ...values, redirectToUsers: true, id: data.user._id });
         });
     });
   };
 
   if (values.redirectToUsers) {
-    return <Redirect to={"/users"} />;
+    return <Redirect to={`/user/${values.id}`} />;
   }
 
   return (
