@@ -55,6 +55,7 @@ export default function EditProfile({ match }) {
     name: "",
     email: "",
     error: "",
+    about: "",
     server_error: "",
     redirectToProfile: false,
   });
@@ -66,7 +67,12 @@ export default function EditProfile({ match }) {
         data && data.error ? (
           <Redirect to="/signin" />
         ) : (
-          setValues({ ...values, name: data.name, email: data.email })
+          setValues({
+            ...values,
+            name: data.name,
+            email: data.email,
+            about: data.about,
+          })
         );
       }
     );
@@ -87,6 +93,15 @@ export default function EditProfile({ match }) {
             })
           : setValues({ ...values, [name]: value, error: "" });
         break;
+      case "about":
+        value.length === 150
+          ? setValues({
+              ...values,
+              error: "Max characters reached",
+              [name]: value,
+            })
+          : setValues({ ...values, error: "", [name]: value });
+        break;
       case "email":
         value.match(/.+\@.+\..+/)
           ? setValues({ ...values, error: "", [name]: value })
@@ -106,6 +121,7 @@ export default function EditProfile({ match }) {
     const userData = {
       name: values.name || undefined,
       email: values.email || undefined,
+      about: values.about || undefined,
     };
 
     update({ userId: match.params.userId }, { t: jwt.token }, userData)
@@ -143,6 +159,24 @@ export default function EditProfile({ match }) {
           }
           required
           onChange={handleInput("name")}
+        />
+        <TextField
+          name="About"
+          label="About"
+          variant={"outlined"}
+          type="text"
+          multiline
+          rows={4}
+          value={values.about}
+          inputProps={{ maxLength: 150 }}
+          className={classes.input}
+          margin="normal"
+          error={values.error.substring(0, 3) === "Max" ? true : false}
+          helperText={
+            values.error.substring(0, 3) === "Max" ? values.error : false
+          }
+          required
+          onChange={handleInput("about")}
         />
         <TextField
           name="Email"
