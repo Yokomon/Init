@@ -88,4 +88,16 @@ const remove = async (req, res) => {
   }
 };
 
-export default { create, list, getUserId, read, update, remove };
+const getProfilePicture = async (req, res) => {
+  try {
+    let user = req.profile;
+    res.set("Content-Type", user.profile_picture.contentType);
+    return res.send(user.profile_picture.data);
+  } catch (error) {
+    return res.status(400).json({
+      error: `An error occured while fetching user picture: ${error}`,
+    });
+  }
+};
+
+export default { create, list, getUserId, read, update, remove, getProfilePicture };
