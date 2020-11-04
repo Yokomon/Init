@@ -15,6 +15,8 @@ import Avatar from "@material-ui/core/Avatar";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { Link } from "react-router-dom";
+import DeleteProfile from "./DeleteProfile";
+import Person from "@material-ui/icons/PersonOutline";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -57,20 +59,23 @@ export default function Profile({ match }) {
     <Paper elevation={2} className={classes.paper}>
       <List dense>
         <Typography variant={"h5"} className={classes.title}>
-          Profile
+          Profile <Person style={{ position: "relative", top: "3px" }} />
         </Typography>
         <ListItem>
           <ListItemAvatar>
             <Avatar />
           </ListItemAvatar>
           <ListItemText primary={values.name} secondary={values.email} />
-          <ListItemSecondaryAction>
-            <Link to={`/user/edit/${values._id}`}>
-              <IconButton>
-                <Edit color="primary" />
-              </IconButton>
-            </Link>
-          </ListItemSecondaryAction>
+          {isAuthenticated() && isAuthenticated().user._id === values._id && (
+            <ListItemSecondaryAction>
+              <Link to={`/user/edit/${values._id}`}>
+                <IconButton>
+                  <Edit color="primary" />
+                </IconButton>
+              </Link>
+              <DeleteProfile userId={values._id} />
+            </ListItemSecondaryAction>
+          )}
         </ListItem>
         <Divider />
         <ListItemText
