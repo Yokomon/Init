@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     margin: theme.spacing(1),
-    color: theme.palette.openTitle
+    color: theme.palette.openTitle,
   },
   paper: {
     textAlign: "center",
@@ -40,6 +40,8 @@ const useStyles = makeStyles((theme) => ({
   btn: {
     margin: "auto",
     marginBottom: theme.spacing(3),
+    color: "#e67c7c",
+    border: "1px solid #e67c7c",
   },
   avatar: {
     width: 50,
@@ -95,12 +97,11 @@ export default function SignUp() {
           ? setValues({
               ...values,
               error: "Password must be 6 characters or more",
-              [name]: value,
             })
           : setValues({ ...values, error: "", [name]: value });
         break;
       default:
-        setValues({ ...values, [name]: value });
+        setValues({ ...values, [name]: value, error: "" });
         break;
     }
   };
@@ -178,7 +179,6 @@ export default function SignUp() {
       )}
       <Button
         variant={"outlined"}
-        color={"primary"}
         className={classes.btn}
         onClick={handleSubmit}
       >
@@ -193,9 +193,9 @@ export default function SignUp() {
         </DialogContent>
         <Divider />
         <DialogActions>
-          <Link to={"/users"}>
+          <Link to={"/signin"}>
             <Button color={"primary"} variant={"contained"} size={"small"}>
-              Users
+              Sign in
             </Button>
           </Link>
         </DialogActions>
