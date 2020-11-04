@@ -34,6 +34,10 @@ const useStyles = makeStyles((theme) => ({
   listItemText: {
     margin: "8px 0px 3px 15px",
   },
+  secondaryText: {
+    top: "5px",
+    position: "relative",
+  },
 }));
 
 export default function Profile({ match }) {
@@ -56,6 +60,10 @@ export default function Profile({ match }) {
       .catch((e) => console.error(e));
   }, [match.params.userId]);
 
+  const photoUrl = values._id
+    ? `/api/user/${values._id}/profilepicture?${new Date().getTime()}`
+    : "";
+
   if (values.error) {
     return <Redirect to="/signin" />;
   }
@@ -71,7 +79,7 @@ export default function Profile({ match }) {
             {loading ? (
               <Skeleton variant="circle" width={50} height={50} />
             ) : (
-              <Avatar width={50} height={50} />
+              <Avatar width={50} height={50} src={photoUrl} />
             )}
           </ListItemAvatar>
           {loading ? (
@@ -104,6 +112,7 @@ export default function Profile({ match }) {
           <ListItemText
             primary={values.about}
             secondary={`Joined: ${new Date(values.created).toDateString()}`}
+            secondaryTypographyProps={{ className: classes.secondaryText }}
             className={classes.listItemText}
           />
         )}
