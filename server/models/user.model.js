@@ -23,6 +23,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  profile_picture: {
+    data: Buffer,
+    contentType: String,
+  },
   salt: String,
   hashed_password: {
     type: String,
