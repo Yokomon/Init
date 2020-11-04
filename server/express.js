@@ -9,7 +9,7 @@ import { webpackCompile } from "./devBundle";
 import Template from "./../template";
 
 const app = express();
-webpackCompile(app);
+// webpackCompile(app);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
