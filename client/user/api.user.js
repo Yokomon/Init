@@ -52,10 +52,9 @@ const update = async (params, credentials, user) => {
       method: "PUT",
       headers: {
         Accept: "application/json",
-        "Content-Type": "application/json",
         Authorization: `Bearer ${credentials.t}`,
       },
-      body: JSON.stringify(user),
+      body: user,
     });
     return await response.json();
   } catch (error) {
@@ -63,4 +62,18 @@ const update = async (params, credentials, user) => {
   }
 };
 
-export { list, create, read, update };
+const remove = async (params, credentials) => {
+  try {
+    let response = await fetch(`/api/user/${params.userId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${credentials.t}`,
+      },
+    });
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export { list, create, read, update, remove };

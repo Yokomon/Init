@@ -3,22 +3,22 @@ import { read, update } from "./api.user";
 import TextField from "@material-ui/core/TextField";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
-import Update from "@material-ui/icons/SystemUpdateOutlined";
-import Avatar from "@material-ui/core/Avatar";
 import Error from "@material-ui/icons/ErrorOutline";
 import { makeStyles } from "@material-ui/core/styles";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import { Redirect } from "react-router-dom";
 import { isAuthenticated } from "./../auth/auth";
+import Picture from "@material-ui/icons/PhotoSizeSelectActualRounded";
 
 const useStyles = makeStyles((theme) => ({
   input: {
     width: 320,
   },
   title: {
-    margin: theme.spacing(1),
     color: theme.palette.openTitle,
+    position: "relative",
+    top: "8px",
   },
   paper: {
     textAlign: "center",
@@ -26,6 +26,11 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: 550,
     position: "relative",
     top: theme.spacing(10),
+  },
+  pic: {
+    position: "relative",
+    top: "15px",
+    color: "#e67c7c",
   },
   content: {
     padding: "16px",
@@ -35,15 +40,14 @@ const useStyles = makeStyles((theme) => ({
     margin: "auto",
     marginBottom: theme.spacing(3),
   },
-  avatar: {
-    width: 50,
-    height: 50,
-    margin: "auto",
-    backgroundColor: "#e04343",
-  },
   error: {
     verticalAlign: "middle",
     margin: theme.spacing(1),
+  },
+  span: {
+    position: "relative",
+    top: "8px",
+    left: "10px",
   },
 }));
 
@@ -55,6 +59,8 @@ export default function EditProfile({ match }) {
     name: "",
     email: "",
     error: "",
+    about: "",
+    profile_picture: "",
     server_error: "",
     redirectToProfile: false,
   });
@@ -66,7 +72,12 @@ export default function EditProfile({ match }) {
         data && data.error ? (
           <Redirect to="/signin" />
         ) : (
-          setValues({ ...values, name: data.name, email: data.email })
+          setValues({
+            ...values,
+            name: data.name,
+            email: data.email,
+            about: data.about,
+          })
         );
       }
     );
@@ -87,6 +98,16 @@ export default function EditProfile({ match }) {
             })
           : setValues({ ...values, [name]: value, error: "" });
         break;
+      case "about":
+        value.length === 150
+          ? setValues({
+              ...values,
+              error: "Max characters reached",
+              [name]: value,
+            })
+          : setValues({ ...values, error: "", [name]: value });
+        break;
+
       case "email":
         value.match(/.+\@.+\..+/)
           ? setValues({ ...values, error: "", [name]: value })
@@ -96,6 +117,10 @@ export default function EditProfile({ match }) {
               [name]: value,
             });
         break;
+      case "profile_picture":
+        const { files } = event.target;
+        setValues({ ...values, error: "", [name]: files[0] });
+        break;
       default:
         setValues({ ...values, [name]: value });
         break;
@@ -103,10 +128,12 @@ export default function EditProfile({ match }) {
   };
 
   const handleSubmit = () => {
-    const userData = {
-      name: values.name || undefined,
-      email: values.email || undefined,
-    };
+    let userData = new FormData();
+    values.name && userData.append("name", values.name);
+    values.about && userData.append("about", values.about);
+    values.email && userData.append("email", values.email);
+    values.profile_picture &&
+      userData.append("profile_picture", values.profile_picture);
 
     update({ userId: match.params.userId }, { t: jwt.token }, userData)
       .then((data) => {
@@ -123,13 +150,23 @@ export default function EditProfile({ match }) {
 
   return (
     <Paper elevation={3} className={classes.paper}>
+      <Typography variant={"h5"} className={classes.title}>
+        Edit profile
+      </Typography>
+      <input
+        accept="image/*"
+        type="file"
+        style={{ display: "none" }}
+        onChange={handleInput("profile_picture")}
+        id="profile_pic"
+      />
+      <label htmlFor="profile_pic">
+        <Picture className={classes.pic} />
+      </label>
+      <span className={classes.span}>
+        {values.profile_picture ? values.profile_picture.name : ""}
+      </span>
       <CardContent>
-        <Avatar className={classes.avatar}>
-          <Update />
-        </Avatar>
-        <Typography variant={"h5"} className={classes.title}>
-          Edit profile
-        </Typography>
         <TextField
           name="Name"
           label="Name"
@@ -143,6 +180,24 @@ export default function EditProfile({ match }) {
           }
           required
           onChange={handleInput("name")}
+        />
+        <TextField
+          name="About"
+          label="About"
+          variant={"outlined"}
+          type="text"
+          multiline
+          rows={4}
+          value={values.about}
+          inputProps={{ maxLength: 150 }}
+          className={classes.input}
+          margin="normal"
+          error={values.error.substring(0, 3) === "Max" ? true : false}
+          helperText={
+            values.error.substring(0, 3) === "Max" ? values.error : false
+          }
+          required
+          onChange={handleInput("about")}
         />
         <TextField
           name="Email"

@@ -1,6 +1,8 @@
 import User from "./../models/user.model";
 import errorHandler from "./../handlers/dbErrorHandler";
 import extend from "lodash/extend";
+import formidable from "formidable";
+import fs from "fs";
 
 // Create new user record
 const create = async (req, res) => {
@@ -58,19 +60,33 @@ const read = (req, res) => {
 // Update a user record
 
 const update = async (req, res) => {
-  try {
+  let form = new formidable.IncomingForm();
+  form.keepExtensions = true;
+
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      return res.status(400).json({
+        error: `An error occured while updating user record: ${err}`,
+      });
+    }
     let user = req.profile;
-    user = extend(user, req.body);
+    user = extend(user, fields);
     user.updated = Date.now();
-    await user.save();
-    user.salt = undefined;
-    user.hashed_password = undefined;
-    res.status(200).json(user);
-  } catch (error) {
-    return res.status(400).json({
-      error: errorHandler.getErrorMessage(error),
-    });
-  }
+    if (files.profile_picture) {
+      user.profile_picture.data = fs.readFileSync(files.profile_picture.path);
+      user.profile_picture.contentType = files.profile_picture.type;
+    }
+    try {
+      await user.save();
+      user.salt = undefined;
+      user.hashed_password = undefined;
+      res.status(200).json(user);
+    } catch (error) {
+      return res.status(400).json({
+        error: errorHandler.getErrorMessage(error),
+      });
+    }
+  });
 };
 
 // Delete a user record
@@ -88,4 +104,24 @@ const remove = async (req, res) => {
   }
 };
 
-export default { create, list, getUserId, read, update, remove };
+const getProfilePicture = async (req, res) => {
+  try {
+    let user = req.profile;
+    res.set("Content-Type", user.profile_picture.contentType);
+    return res.send(user.profile_picture.data);
+  } catch (error) {
+    return res.status(400).json({
+      error: `An error occured while fetching user picture: ${error}`,
+    });
+  }
+};
+
+export default {
+  create,
+  list,
+  getUserId,
+  read,
+  update,
+  remove,
+  getProfilePicture,
+};

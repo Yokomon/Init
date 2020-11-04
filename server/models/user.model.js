@@ -4,12 +4,14 @@ import crypto from "crypto";
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
+    trim: true,
     required: "Name field is required",
   },
   email: {
     type: String,
     required: "Email needs to be filled",
     unique: "Email is already associated with an account",
+    trim: true,
     match: [/.+\@.+\..+/, "Email address is invalid"],
   },
   created: {
@@ -17,6 +19,14 @@ const UserSchema = new mongoose.Schema({
     default: Date.now(),
   },
   updated: Date,
+  about: {
+    type: String,
+    trim: true,
+  },
+  profile_picture: {
+    data: Buffer,
+    contentType: String,
+  },
   salt: String,
   hashed_password: {
     type: String,

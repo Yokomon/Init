@@ -15,6 +15,9 @@ import Avatar from "@material-ui/core/Avatar";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { Link } from "react-router-dom";
+import DeleteProfile from "./DeleteProfile";
+import Person from "@material-ui/icons/PersonOutline";
+import Skeleton from "@material-ui/lab/Skeleton";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -31,9 +34,14 @@ const useStyles = makeStyles((theme) => ({
   listItemText: {
     margin: "8px 0px 3px 15px",
   },
+  secondaryText: {
+    top: "5px",
+    position: "relative",
+  },
 }));
 
 export default function Profile({ match }) {
+  const [loading, setLoading] = useState(true);
   const [values, setValues] = useState({});
   const classes = useStyles();
   useEffect(() => {
@@ -42,12 +50,19 @@ export default function Profile({ match }) {
     let jwt = isAuthenticated();
     read({ userId: match.params.userId }, { t: jwt.token }, signal)
       .then((data) => {
-        data && data.error
-          ? setValues({ ...values, error: data.error })
-          : setValues(data);
+        if (data && data.error) {
+          setValues({ ...values, error: data.error });
+        } else {
+          setLoading(false);
+          setValues(data);
+        }
       })
       .catch((e) => console.error(e));
   }, [match.params.userId]);
+
+  const photoUrl = values._id
+    ? `/api/user/${values._id}/profilepicture?${new Date().getTime()}`
+    : "";
 
   if (values.error) {
     return <Redirect to="/signin" />;
@@ -57,26 +72,50 @@ export default function Profile({ match }) {
     <Paper elevation={2} className={classes.paper}>
       <List dense>
         <Typography variant={"h5"} className={classes.title}>
-          Profile
+          Profile <Person style={{ position: "relative", top: "3px" }} />
         </Typography>
         <ListItem>
           <ListItemAvatar>
-            <Avatar />
+            {loading ? (
+              <Skeleton variant="circle" width={50} height={50} />
+            ) : (
+              <Avatar width={50} height={50} src={photoUrl} />
+            )}
           </ListItemAvatar>
-          <ListItemText primary={values.name} secondary={values.email} />
-          <ListItemSecondaryAction>
-            <Link to={`/user/edit/${values._id}`}>
-              <IconButton>
-                <Edit color="primary" />
-              </IconButton>
-            </Link>
-          </ListItemSecondaryAction>
+          {loading ? (
+            <div style={{ width: 300 }}>
+              <Skeleton />
+              <Skeleton width={100} />
+            </div>
+          ) : (
+            <ListItemText primary={values.name} secondary={values.email} />
+          )}
+
+          {isAuthenticated() && isAuthenticated().user._id === values._id && (
+            <ListItemSecondaryAction>
+              <Link to={`/user/edit/${values._id}`}>
+                <IconButton>
+                  <Edit color="primary" />
+                </IconButton>
+              </Link>
+              <DeleteProfile userId={values._id} />
+            </ListItemSecondaryAction>
+          )}
         </ListItem>
         <Divider />
-        <ListItemText
-          primary={`Joined: ${new Date(values.created).toDateString()}`}
-          className={classes.listItemText}
-        />
+        {loading ? (
+          <div style={{ margin: "10px 0px 5px 10px", width: 220 }}>
+            <Skeleton />
+            <Skeleton width={80} />
+          </div>
+        ) : (
+          <ListItemText
+            primary={values.about}
+            secondary={`Joined: ${new Date(values.created).toDateString()}`}
+            secondaryTypographyProps={{ className: classes.secondaryText }}
+            className={classes.listItemText}
+          />
+        )}
       </List>
     </Paper>
   );
