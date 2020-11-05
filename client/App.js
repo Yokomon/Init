@@ -1,18 +1,22 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { hot } from "react-hot-loader";
 import MainRouter from "./MainRouter";
 import { BrowserRouter } from "react-router-dom";
 import theme from "./theme";
 import { ThemeProvider } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
 
 const App = () => {
+  useEffect(() => {
+    const jss = document.getElementById("jss-server-side");
+    if (jss) {
+      jss.parentNode.removeChild(jss);
+    }
+  }, []);
+
   return (
     <BrowserRouter>
       <ThemeProvider theme={theme}>
-        <Paper style={{ height: "100vh" }}>
-          <MainRouter />
-        </Paper>
+        <MainRouter />
       </ThemeProvider>
     </BrowserRouter>
   );
